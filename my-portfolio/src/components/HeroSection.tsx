@@ -13,7 +13,7 @@ export default function HeroSection() {
                 <h1 className="text-4xl font-bold text-white">
                     Hi, I'm Yusuf!
                 </h1>
-                <p className="text-lg mt-4 text-gray-300">
+                <p className="text-lg mt-4 text-300">
                     Software Engineer • API Developer
                 </p>
             </motion.div>
