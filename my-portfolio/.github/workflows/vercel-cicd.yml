@@ -1,0 +1,41 @@
+name: Vercel CI/CD
+
+on:
+  push:
+    # Trigger deployment on pushes to main or develop
+    branches: [ main, develop ] 
+
+  pull_request:
+    # Run tests on pull requests
+    branches: [ main, develop ] 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Check out the current commit's code
+          submodules: true
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 # Use a stable LTS version
+
+      - name: Install dependencies
+        run: npm install
+        # This step installs all dependencies listed in package.json
+
+      - name: Build Project
+        run: npm run build
+        # This executes 'next build' which compiles the Next.js application
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          # Use the secrets you just provided
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
