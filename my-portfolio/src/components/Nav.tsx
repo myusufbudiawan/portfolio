@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { profile } from "@/lib/profile";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const items = [
   { href: "/", label: "Home" },
@@ -98,6 +99,9 @@ export default function Nav() {
             </li>
           );
         })}
+        <li className="flex items-center md:hidden">
+          <ThemeToggle compact />
+        </li>
         <li className="nav-email pl-0.5">
           <a
             href={`mailto:${profile.email}`}

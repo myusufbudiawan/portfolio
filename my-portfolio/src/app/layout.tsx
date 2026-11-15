@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Nav from "@/components/Nav";
+import ThemeToggle from "@/components/ThemeToggle";
+import { themeScript } from "@/lib/theme";
 import Footer from "@/components/Footer";
 import { profile } from "@/lib/profile";
 
@@ -67,6 +69,11 @@ export default function RootLayout({
        as an attribute mismatch it will not patch. Nothing in this app branches
        on window at render time. */
     <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <head>
+        {/* Applies a stored theme before first paint. Inline and synchronous on
+            purpose: anything deferred shows the wrong palette for a frame. */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="antialiased" suppressHydrationWarning>
         <div className="aurora" aria-hidden="true">
           <span className="aurora-3" />
@@ -78,6 +85,10 @@ export default function RootLayout({
         </a>
 
         <Nav />
+
+        <div className="fixed right-4 top-5 z-40 hidden md:block">
+          <ThemeToggle />
+        </div>
 
         <main id="main" className="relative">
           {children}

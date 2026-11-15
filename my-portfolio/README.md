@@ -68,6 +68,11 @@ Each material degrades independently: `prefers-reduced-transparency` turns glass
 a solid surface and drops the aurora, `prefers-contrast: more` adds a 1.5px ink border,
 `prefers-reduced-motion` removes movement and keeps opacity.
 
+Theme is light / dark / system, chosen from the control at the top right (inside the nav
+capsule on phones). "System" removes `data-theme` so the OS decides; an explicit choice
+sets it and persists in `localStorage`, applied by an inline script in `<head>` before first
+paint so there is no flash of the wrong palette.
+
 ## Adding a project
 
 Open `/add-project`, fill the form, copy the generated entry, and paste it as the first
