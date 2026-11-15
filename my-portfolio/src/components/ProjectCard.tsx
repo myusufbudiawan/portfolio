@@ -17,10 +17,14 @@ export default function ProjectCard({
   project,
   size = "md",
   level = 3,
+  mutedPreview = false,
 }: {
   project: Project;
   size?: "md" | "lg";
   level?: 2 | 3;
+  /** On the work index the cover is a blurred preview; the case study is where
+   *  the reader actually gets to use the app. */
+  mutedPreview?: boolean;
 }) {
   const wide = size === "lg";
   const Heading = level === 2 ? "h2" : "h3";
@@ -36,6 +40,14 @@ export default function ProjectCard({
         wide ? "md:flex-row" : ""
       }`}
     >
+      {/* One link per card, stretched over the whole surface so the cover is
+          part of the target. The accessible name comes from the sr-only text;
+          the visible heading is not itself a link, which keeps the tab order to
+          a single stop per card. */}
+      <Link href={`/work/${project.slug}`} className="absolute inset-0 z-20">
+        <span className="sr-only">{project.title}: read the case study</span>
+      </Link>
+
       {project.demoUrl && wide ? (
         <div
           className="project-plate relative flex items-center overflow-hidden p-4 md:w-[42%] md:shrink-0 md:p-5"
@@ -46,6 +58,7 @@ export default function ProjectCard({
             href={project.demoUrl}
             label={project.demoLabel ?? "live demo"}
             title={`${project.title} live preview`}
+            muted={mutedPreview}
             className="w-full"
           />
         </div>
@@ -105,14 +118,7 @@ export default function ProjectCard({
           )}
         </div>
 
-        <Heading className={`${titleClass} mt-3.5`}>
-          <Link
-            href={`/work/${project.slug}`}
-            className="transition-colors duration-200 after:absolute after:inset-0 after:z-20 after:content-['']"
-          >
-            {project.title}
-          </Link>
-        </Heading>
+        <Heading className={`${titleClass} mt-3.5`}>{project.title}</Heading>
 
         <p className="t-sm mt-2.5 max-w-[52ch] text-ink-2">{project.summary}</p>
 

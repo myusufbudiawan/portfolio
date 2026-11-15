@@ -36,6 +36,7 @@ export default function WorkPage() {
                 project={project}
                 size={index === 0 ? "lg" : "md"}
                 level={2}
+                mutedPreview
               />
             </div>
           ))}

@@ -35,6 +35,7 @@ export default function LiveWindow({
   title,
   variant = "window",
   height,
+  muted = false,
   className = "",
 }: {
   href: string;
@@ -42,6 +43,8 @@ export default function LiveWindow({
   title: string;
   variant?: Variant;
   height?: string;
+  /** Blurred, non-interactive preview — used where the embed is a cover. */
+  muted?: boolean;
   className?: string;
 }) {
   const host = useRef<HTMLDivElement>(null);
@@ -81,11 +84,14 @@ export default function LiveWindow({
   }, []);
 
   const isMini = variant === "mini";
+  /* Preview variants are decorative: the card's own link is the control, so the
+     frame must not take a tab stop or a screen-reader stop. */
+  const isPreview = isMini || muted;
 
   return (
     <div
       ref={host}
-      className={`live live--${variant} ${className}`}
+      className={`live live--${variant} ${muted ? "live--muted" : ""} ${className}`}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -197,7 +203,12 @@ export default function LiveWindow({
             title={title}
             className="live__frame"
             loading="lazy"
+            tabIndex={isPreview ? -1 : undefined}
+            aria-hidden={isPreview ? true : undefined}
             referrerPolicy="strict-origin-when-cross-origin"
+            /* No allow-top-navigation: the embedded app can never move the
+               portfolio out from under the reader. */
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"
             style={{ display: "block", width: "100%", height: "100%", border: 0 }}
             onLoad={() => setLoading(false)}
           />

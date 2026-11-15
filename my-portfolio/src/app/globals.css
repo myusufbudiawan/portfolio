@@ -801,9 +801,35 @@
   }
 }
 
-/* The snippet on the home page is a preview, not a scroll trap. */
-.live--mini .live__viewport {
+/* Preview variants are not control surfaces: the pointer belongs to the card. */
+.live--mini .live__viewport,
+.live--muted .live__viewport {
   pointer-events: none;
+}
+
+/* A blurred cover reads as "a look at the product", not as something to use.
+   The veil keeps the tinted plate legible through the frame. */
+.live--muted .live__frame {
+  filter: blur(2.5px) saturate(0.82);
+  transform: scale(1.02);
+}
+
+.live--muted .live__viewport::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--canvas) 12%, transparent),
+    color-mix(in oklab, var(--canvas) 34%, transparent)
+  );
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .live--muted .live__frame {
+    filter: blur(2px);
+  }
 }
 
 .live__fade {
