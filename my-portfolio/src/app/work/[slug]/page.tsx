@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Glass from "@/components/Glass";
 import SpecularCard from "@/components/SpecularCard";
+import LiveWindow from "@/components/LiveWindow";
 import { getNeighbours, getProject, projects } from "@/lib/projects";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -37,6 +38,29 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
+function Plate({ plate }: { plate: string[] }) {
+  return (
+    <SpecularCard className="glass glass-lift overflow-hidden">
+      <div className="border-b border-[var(--line)] px-5 py-4">
+        <p className="t-label text-ink-3">Top level</p>
+      </div>
+      <ul className="hairline-list">
+        {plate.map((line) => (
+          <li
+            key={line}
+            className="px-5 py-2.5 font-mono text-[0.8125rem] text-ink-2"
+          >
+            <span aria-hidden="true" className="mr-2 text-ink-3/60">
+              └
+            </span>
+            {line}
+          </li>
+        ))}
+      </ul>
+    </SpecularCard>
+  );
+}
+
 export default async function ProjectPage({ params }: Params) {
   const { slug } = await params;
   const project = getProject(slug);
@@ -60,8 +84,8 @@ export default async function ProjectPage({ params }: Params) {
         All work
       </Link>
 
-      <header className="mt-8 grid gap-8 md:grid-cols-12 md:gap-10">
-        <div className="md:col-span-7">
+      <header className="mt-8 grid gap-10 md:grid-cols-12 md:gap-12">
+        <div className="min-w-0 md:col-span-7">
           <div className="flex flex-wrap items-center gap-2">
             <span className="chip chip-solid">{project.kicker}</span>
             <span className="chip">{project.status}</span>
@@ -69,27 +93,41 @@ export default async function ProjectPage({ params }: Params) {
           </div>
           <h1 className="t-display mt-5">{project.title}</h1>
           <p className="t-lg measure mt-5 text-ink-2">{project.summary}</p>
+
+          {project.demoUrl && (
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <a
+                href={project.demoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+              >
+                Open the live app
+                <span aria-hidden="true">↗</span>
+              </a>
+              <span className="t-xs text-ink-3">or use the window directly</span>
+            </div>
+          )}
         </div>
 
-        <div className="md:col-span-5">
-          <SpecularCard className="glass glass-lift overflow-hidden">
-            <div className="border-b border-[var(--line)] px-5 py-4">
-              <p className="t-label text-ink-3">Top level</p>
-            </div>
-            <ul className="hairline-list">
-              {project.plate.map((line) => (
-                <li
-                  key={line}
-                  className="px-5 py-2.5 font-mono text-[0.8125rem] text-ink-2"
-                >
-                  <span aria-hidden="true" className="mr-2 text-ink-3/60">
-                    └
-                  </span>
-                  {line}
-                </li>
-              ))}
-            </ul>
-          </SpecularCard>
+        <div className="min-w-0 md:col-span-5">
+          {project.demoUrl ? (
+            <>
+              <LiveWindow
+                variant={project.demoKind === "phone" ? "phone" : "window"}
+                href={project.demoUrl}
+                label={project.demoLabel ?? "live demo"}
+                title={`${project.title} live demo`}
+                height={project.demoKind === "phone" ? "32rem" : "22rem"}
+              />
+              <p className="t-xs mt-3 text-center text-ink-3">
+                The deployed build, embedded. Scroll inside the window to move
+                around the app.
+              </p>
+            </>
+          ) : (
+            <Plate plate={project.plate} />
+          )}
         </div>
       </header>
 
@@ -112,7 +150,7 @@ export default async function ProjectPage({ params }: Params) {
           </ul>
         </div>
 
-        <aside className="md:col-span-5">
+        <aside className="flex flex-col gap-5 md:col-span-5">
           <Glass className="p-6">
             <p className="t-label text-ink-3">Stack</p>
             <ul className="mt-4 flex flex-wrap gap-1.5">
@@ -130,7 +168,7 @@ export default async function ProjectPage({ params }: Params) {
                 href={project.repoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary w-full"
+                className="btn btn-glass w-full"
               >
                 View repository
                 <span aria-hidden="true">↗</span>
@@ -142,7 +180,7 @@ export default async function ProjectPage({ params }: Params) {
                   to. Happy to walk through it in a call.
                 </p>
                 <a
-                  href="mailto:myusufbudiawan@gmail.com?subject=Preemie%20Tracker"
+                  href="mailto:myusufbudiawan@gmail.com?subject=PreemieTrack"
                   className="btn btn-glass mt-4 w-full"
                 >
                   Ask about it
@@ -150,6 +188,8 @@ export default async function ProjectPage({ params }: Params) {
               </div>
             )}
           </Glass>
+
+          {project.demoUrl && <Plate plate={project.plate} />}
         </aside>
       </div>
 

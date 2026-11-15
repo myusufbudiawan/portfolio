@@ -98,7 +98,7 @@ export default function Nav() {
             </li>
           );
         })}
-        <li className="pl-0.5">
+        <li className="nav-email pl-0.5">
           <a
             href={`mailto:${profile.email}`}
             className="flex h-10 items-center rounded-full bg-ink px-3.5 text-[0.8125rem] font-medium text-canvas transition-colors duration-200 hover:bg-ink-2"

@@ -25,22 +25,22 @@ export default function Home() {
 
         <div className="grid gap-5 md:grid-cols-12">
           {lead && (
-            <div className="md:col-span-12 lg:col-span-7">
+            <div className="min-w-0 md:col-span-12 lg:col-span-7">
               <ProjectCard project={lead} size="lg" />
             </div>
           )}
           {second && (
-            <div className="md:col-span-6 lg:col-span-5">
+            <div className="min-w-0 md:col-span-6 lg:col-span-5">
               <ProjectCard project={second} />
             </div>
           )}
           {third && (
-            <div className="md:col-span-6 lg:col-span-5">
+            <div className="min-w-0 md:col-span-6 lg:col-span-5">
               <ProjectCard project={third} />
             </div>
           )}
 
-          <div className="md:col-span-12 lg:col-span-7">
+          <div className="min-w-0 md:col-span-12 lg:col-span-7">
             <Glass
               as="section"
               className="flex h-full flex-col justify-between p-6 md:p-8"

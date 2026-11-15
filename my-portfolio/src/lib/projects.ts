@@ -19,6 +19,12 @@ export type Project = {
   stack: string[];
   plate: string[];
   repoUrl?: string;
+  /** Deployed build that can be embedded in an iframe. */
+  demoUrl?: string;
+  /** What the address bar shows. */
+  demoLabel?: string;
+  /** Phone width for mobile apps exported to web. */
+  demoKind?: "phone" | "window";
   status: "Shipped" | "In progress" | "Archived";
   featured?: boolean;
   /** Hue for the card tint. Low chroma on purpose, applied in globals.css. */
@@ -28,26 +34,26 @@ export type Project = {
 export const projects: Project[] = [
   {
     slug: "preemie-tracker",
-    title: "Preemie Tracker",
+    title: "PreemieTrack",
     year: 2026,
     kicker: "Personal product",
     summary:
-      "Offline-first care and pumping schedule tracking for a premature baby, synced between two phones.",
+      "A calm, local-first tracker for premature-infant care: six care-event types, notes, and a configurable corrected-age engine.",
     description:
-      "A two-person app built around one constraint: the record has to keep working in a NICU with bad signal. Every write lands in a local store first and reconciles to Supabase when a connection is available, so both caregivers see the same schedule without either of them waiting on a round trip. Built end to end with Claude Code, from schema to the Expo screens.",
+      "Built around the one constraint that matters in a NICU: the log has to work before anything else does. Every care event is written to a local SQLite store first, across all six event types plus free-text notes, behind a SecureStore-backed session boundary. A configurable corrected-age engine sits underneath it, and a Fastify API exposes the care-events and audit domains. The window above is the deployed build, not a recording.",
     highlights: [
-      "Offline-first local persistence with realtime sync across two devices",
-      "Care log and pumping schedule modelled around one baby and two caregivers",
-      "Built end to end, from schema to sync layer to Expo UI, with Claude Code",
-      "Private repository, so there is no public link to show",
+      "Local-first SQLite logging across six care-event types plus notes",
+      "Configurable corrected-age engine, explicitly flagged for clinical review",
+      "SecureStore-backed session boundary; no clinical thresholds or dosing logic shipped",
+      "Fastify API with a care-events / audit domain pair",
+      "Phase 0 and Phase 1 done; growth dashboards, reminders, sync and auth are Phase 2",
     ],
-    stack: ["React Native", "Expo", "TypeScript", "Supabase", "Claude Code"],
-    plate: [
-      "local store first",
-      "sync → Supabase",
-      "realtime channel",
-      "Expo screens",
-    ],
+    stack: ["Expo", "React Native", "TypeScript", "SQLite", "Fastify"],
+    plate: ["apps/mobile/", "services/", "docs/", "PREEMIETRACK_PLAN.md"],
+    repoUrl: "https://github.com/myusufbudiawan/NadineApp",
+    demoUrl: "https://nadineapp-mobile.vercel.app/home",
+    demoLabel: "nadineapp-mobile.vercel.app/home",
+    demoKind: "phone",
     status: "In progress",
     featured: true,
     hue: 52,

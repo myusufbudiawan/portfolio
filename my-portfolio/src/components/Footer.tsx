@@ -50,11 +50,6 @@ export default function Footer() {
           </ul>
         </nav>
       </div>
-
-      <p className="t-xs mt-10 text-ink-3">
-        Built with Next.js and Tailwind. Type set in your system face; the glass
-        is CSS, the colour is an OKLCH gradient, and there are no images.
-      </p>
     </footer>
   );
 }

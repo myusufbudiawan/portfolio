@@ -30,7 +30,7 @@ export default function WorkPage() {
           {projects.map((project, index) => (
             <div
               key={project.slug}
-              className={index === 0 ? "md:col-span-2" : undefined}
+              className={`min-w-0 ${index === 0 ? "md:col-span-2" : ""}`}
             >
               <ProjectCard
                 project={project}
