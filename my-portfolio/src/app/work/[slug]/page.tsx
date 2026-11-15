@@ -85,7 +85,7 @@ export default async function ProjectPage({ params }: Params) {
       </Link>
 
       <header className="mt-8 grid gap-10 md:grid-cols-12 md:gap-12">
-        <div className="min-w-0 md:col-span-7">
+        <div className="min-w-0 md:col-span-6">
           <div className="flex flex-wrap items-center gap-2">
             <span className="chip chip-solid">{project.kicker}</span>
             <span className="chip">{project.status}</span>
@@ -110,7 +110,7 @@ export default async function ProjectPage({ params }: Params) {
           )}
         </div>
 
-        <div className="min-w-0 md:col-span-5">
+        <div className="min-w-0 md:col-span-6">
           {project.demoUrl ? (
             <>
               <LiveWindow
@@ -118,7 +118,6 @@ export default async function ProjectPage({ params }: Params) {
                 href={project.demoUrl}
                 label={project.demoLabel ?? "live demo"}
                 title={`${project.title} live demo`}
-                height={project.demoKind === "phone" ? "32rem" : "22rem"}
               />
               <p className="t-xs mt-3 text-center text-ink-3">
                 The deployed build, embedded. Scroll inside the window to move

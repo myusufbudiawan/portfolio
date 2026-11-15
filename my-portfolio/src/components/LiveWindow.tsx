@@ -5,16 +5,29 @@ import { useCallback, useEffect, useRef, useState } from "react";
 type Variant = "window" | "phone" | "mini";
 
 /**
+ * Geometry is applied inline on purpose. A stale or partial stylesheet must not
+ * be able to collapse this window into an unstyled stack of elements; the
+ * material (blur, rim, radii, colours) stays in globals.css where it belongs.
+ */
+const SIZES = {
+  mini: { height: "15rem", maxWidth: "100%", bar: "1.875rem", pad: "0.5rem" },
+  phone: { height: "clamp(30rem, 62vh, 38rem)", maxWidth: "28rem", bar: "2.5rem", pad: "0.6875rem" },
+  window: { height: "clamp(20rem, 46vh, 30rem)", maxWidth: "100%", bar: "2.5rem", pad: "0.6875rem" },
+} as const;
+
+/**
  * A running app inside the page, framed as a window: glass chrome, a real
  * address bar, and the site itself in an iframe.
  *
  * Three decisions worth knowing:
- * - The iframe mounts only when the window is within 400px of the viewport, so
- *   a below-the-fold embed costs nothing until the reader gets there.
- * - On touch devices a tap hands control to the embed, because an interactive
- *   iframe otherwise swallows the page scroll and strands the reader.
- * - The `mini` variant is never interactive (pointer-events: none) — on the
- *   home page it is a snippet, not a control surface.
+ * - The iframe mounts only within 400px of the viewport, so a below-the-fold
+ *   embed costs nothing until the reader gets there.
+ * - Touch devices get one tap to hand over control, because an interactive
+ *   iframe otherwise swallows page scroll. The gate keys off `pointer: coarse`
+ *   rather than `hover: none`, since hybrid laptops report no hover and still
+ *   work fine with a mouse.
+ * - The `mini` variant is never interactive (pointer-events: none): on the home
+ *   page it is a snippet, not a control surface.
  */
 export default function LiveWindow({
   href,
@@ -37,8 +50,8 @@ export default function LiveWindow({
   const [activated, setActivated] = useState(false);
   const [nonce, setNonce] = useState(0);
 
-  const viewportHeight =
-    height ?? (variant === "mini" ? "15rem" : variant === "phone" ? "34rem" : "30rem");
+  const size = SIZES[variant];
+  const viewportHeight = height ?? size.height;
 
   useEffect(() => {
     const node = host.current;
@@ -73,9 +86,26 @@ export default function LiveWindow({
     <div
       ref={host}
       className={`live live--${variant} ${className}`}
-      style={{ ["--live-h" as string]: viewportHeight }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        maxWidth: size.maxWidth,
+        minWidth: 0,
+        marginInline: variant === "phone" ? "auto" : undefined,
+      }}
     >
-      <div className="live__bar">
+      <div
+        className="live__bar"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          flexShrink: 0,
+          gap: isMini ? "0.375rem" : "0.625rem",
+          height: size.bar,
+          paddingInline: size.pad,
+        }}
+      >
         <span className="live__lights" aria-hidden="true">
           <span className="live__light" />
           <span className="live__light" />
@@ -89,7 +119,7 @@ export default function LiveWindow({
             viewBox="0 0 24 24"
             fill="none"
             aria-hidden="true"
-            className="shrink-0 opacity-60"
+            style={{ flexShrink: 0, opacity: 0.6 }}
           >
             <path
               d="M7 10V7a5 5 0 0 1 10 0v3M6 10h12v9H6z"
@@ -99,7 +129,15 @@ export default function LiveWindow({
               strokeLinejoin="round"
             />
           </svg>
-          <span className="truncate">{label}</span>
+          <span
+            style={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {label}
+          </span>
         </span>
 
         {!isMini && (
@@ -141,7 +179,15 @@ export default function LiveWindow({
         )}
       </div>
 
-      <div className="live__viewport" style={{ height: viewportHeight }}>
+      <div
+        className="live__viewport"
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          height: viewportHeight,
+          minWidth: 0,
+        }}
+      >
         {!mounted && <div className="live__idle" aria-hidden="true" />}
 
         {mounted && (
@@ -152,6 +198,7 @@ export default function LiveWindow({
             className="live__frame"
             loading="lazy"
             referrerPolicy="strict-origin-when-cross-origin"
+            style={{ display: "block", width: "100%", height: "100%", border: 0 }}
             onLoad={() => setLoading(false)}
           />
         )}

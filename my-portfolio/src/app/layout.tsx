@@ -61,8 +61,13 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="antialiased">
+    /* suppressHydrationWarning is scoped to these two elements only. Browser
+       extensions (password managers, readers, toolbar overlays) inject
+       attributes onto <html>/<body> before React hydrates, which React reports
+       as an attribute mismatch it will not patch. Nothing in this app branches
+       on window at render time. */
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <body className="antialiased" suppressHydrationWarning>
         <div className="aurora" aria-hidden="true">
           <span className="aurora-3" />
         </div>
