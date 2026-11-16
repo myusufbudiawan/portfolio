@@ -1,89 +1,242 @@
-import { projects } from "@/lib/projects";
-import { notFound } from "next/navigation";
-import Header from "@/components/Header";
+import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import Glass from "@/components/Glass";
+import SpecularCard from "@/components/SpecularCard";
+import LiveWindow from "@/components/LiveWindow";
+import { getNeighbours, getProject, projects } from "@/lib/projects";
+import { siteUrl } from "@/lib/site";
 
-export default function ProjectPage({ params }: { params: { slug: string } }) {
-  const project = projects.find((p) => p.slug === params.slug);
+type Params = { params: Promise<{ slug: string }> };
 
-  if (!project) {
-    notFound();
-  }
+export function generateStaticParams() {
+  return projects.map((project) => ({ slug: project.slug }));
+}
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { slug } = await params;
+  const project = getProject(slug);
+  if (!project) return { title: "Project not found" };
+
+  const description = project.summary;
+  return {
+    title: project.title,
+    description,
+    alternates: { canonical: `${siteUrl}/work/${project.slug}/` },
+    openGraph: {
+      title: `${project.title}, ${project.year}`,
+      description,
+      type: "article",
+      images: [
+        {
+          url: `${siteUrl}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: `${project.title}, ${project.year}`,
+        },
+      ],
+    },
+  };
+}
+
+function Plate({ plate }: { plate: string[] }) {
+  return (
+    <SpecularCard className="glass glass-lift overflow-hidden">
+      <div className="border-b border-[var(--line)] px-5 py-4">
+        <p className="t-label text-ink-3">Top level</p>
+      </div>
+      <ul className="hairline-list">
+        {plate.map((line) => (
+          <li
+            key={line}
+            className="px-5 py-2.5 font-mono text-[0.8125rem] text-ink-2"
+          >
+            <span aria-hidden="true" className="mr-2 text-ink-3/60">
+              └
+            </span>
+            {line}
+          </li>
+        ))}
+      </ul>
+    </SpecularCard>
+  );
+}
+
+export default async function ProjectPage({ params }: Params) {
+  const { slug } = await params;
+  const project = getProject(slug);
+
+  if (!project) notFound();
+
+  const { previous, next } = getNeighbours(slug);
 
   return (
-    <main className="font-sans max-w-4xl mx-auto p-4">
-      <Header />
-      <article className="py-12">
-        <Link
-          href="/work"
-          className="inline-block text-sm text-muted-foreground hover:text-foreground mb-8"
+    <article className="shell pt-32 pb-16 md:pt-40 md:pb-24">
+      <Link
+        href="/work"
+        className="t-sm group inline-flex items-center gap-1.5 text-ink-2 transition-colors duration-200 hover:text-ink"
+      >
+        <span
+          aria-hidden="true"
+          className="transition-transform duration-[220ms] ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-x-0.5"
         >
-          ← Back to Work
-        </Link>
+          ←
+        </span>
+        All work
+      </Link>
 
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-xs px-2 py-1 rounded-full bg-secondary text-secondary-foreground">
-              {project.status}
-            </span>
-            <span className="text-sm text-muted-foreground">{project.year}</span>
+      <header className="mt-8 grid gap-10 md:grid-cols-12 md:gap-12">
+        <div className="min-w-0 md:col-span-6">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="chip chip-solid">{project.kicker}</span>
+            <span className="chip">{project.status}</span>
+            <span className="chip tnum">{project.year}</span>
           </div>
-          <h1 className="text-4xl font-bold mb-2">{project.title}</h1>
-          <p className="text-xl text-muted-foreground">{project.tagline}</p>
-        </div>
+          <h1 className="t-display mt-5">{project.title}</h1>
+          <p className="t-lg measure mt-5 text-ink-2">{project.summary}</p>
 
-        <div
-          className="aspect-video rounded-lg mb-8 flex items-center justify-center"
-          style={{
-            background: 'linear-gradient(135deg, rgba(100, 116, 139, 0.15) 0%, rgba(100, 116, 139, 0.05) 100%)'
-          }}
-        >
-          <h2 className="text-5xl font-bold text-slate-600 dark:text-slate-400 text-center px-4">
-            {project.title}
-          </h2>
-        </div>
-
-        <div className="prose max-w-none mb-8">
-          <p className="text-lg leading-relaxed">{project.description}</p>
-        </div>
-
-        <div className="mb-8">
-          <h2 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">
-            Technologies
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-3 py-1 text-sm border border-border rounded-md"
+          {project.demoUrl && (
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <a
+                href={project.demoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
               >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex gap-4">
-          <a
-            href={project.repoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-4 py-2 bg-foreground text-background rounded-md hover:bg-accent hover:text-background transition-colors"
-          >
-            View Repository
-          </a>
-          {project.liveUrl && (
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 border border-border rounded-md hover:bg-secondary transition-colors"
-            >
-              Live Demo
-            </a>
+                Open the live app
+                <span aria-hidden="true">↗</span>
+              </a>
+              <span className="t-xs text-ink-3">or use the window directly</span>
+            </div>
           )}
         </div>
-      </article>
-    </main>
+
+        <div className="min-w-0 md:col-span-6">
+          {project.demoUrl ? (
+            <>
+              <LiveWindow
+                variant={project.demoKind === "phone" ? "phone" : "window"}
+                href={project.demoUrl}
+                label={project.demoLabel ?? "live demo"}
+                title={`${project.title} live demo`}
+              />
+              <p className="t-xs mt-3 text-center text-ink-3">
+                The deployed build, embedded. Scroll inside the window to move
+                around the app.
+              </p>
+            </>
+          ) : (
+            <Plate plate={project.plate} />
+          )}
+        </div>
+      </header>
+
+      <div className="mt-14 grid gap-10 md:mt-20 md:grid-cols-12 md:gap-12">
+        <div className="md:col-span-7">
+          <h2 className="t-label text-ink-3">What it is</h2>
+          <p className="t-lg mt-4 text-ink-2">{project.description}</p>
+
+          <h2 className="t-label mt-12 text-ink-3">What is in it</h2>
+          <ul className="mt-4 space-y-3">
+            {project.highlights.map((item) => (
+              <li key={item} className="t-base flex gap-3 text-ink-2">
+                <span
+                  aria-hidden="true"
+                  className="mt-[0.65em] h-1 w-1 shrink-0 rounded-full bg-accent"
+                />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <aside className="flex flex-col gap-5 md:col-span-5">
+          <Glass className="p-6">
+            <p className="t-label text-ink-3">Stack</p>
+            <ul className="mt-4 flex flex-wrap gap-1.5">
+              {project.stack.map((item) => (
+                <li key={item} className="chip">
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <div className="rule my-6" />
+
+            {project.repoUrl ? (
+              <a
+                href={project.repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-glass w-full"
+              >
+                View repository
+                <span aria-hidden="true">↗</span>
+              </a>
+            ) : (
+              <div>
+                <p className="t-sm text-ink-2">
+                  This one is a private repository, so there is nothing to link
+                  to. Happy to walk through it in a call.
+                </p>
+                <a
+                  href="mailto:myusufbudiawan@gmail.com?subject=PreemieTrack"
+                  className="btn btn-glass mt-4 w-full"
+                >
+                  Ask about it
+                </a>
+              </div>
+            )}
+          </Glass>
+
+          {project.demoUrl && <Plate plate={project.plate} />}
+        </aside>
+      </div>
+
+      <div className="rule mt-16" />
+
+      <nav
+        aria-label="Project navigation"
+        className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-between"
+      >
+        {previous ? (
+          <Link
+            href={`/work/${previous.slug}`}
+            className="t-sm group text-ink-2 transition-colors duration-200 hover:text-ink"
+          >
+            <span className="t-label block text-ink-3">Previous</span>
+            <span className="mt-1.5 inline-flex items-center gap-1.5">
+              <span
+                aria-hidden="true"
+                className="transition-transform duration-[220ms] ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-x-0.5"
+              >
+                ←
+              </span>
+              {previous.title}
+            </span>
+          </Link>
+        ) : (
+          <span />
+        )}
+
+        {next && (
+          <Link
+            href={`/work/${next.slug}`}
+            className="t-sm group text-ink-2 transition-colors duration-200 hover:text-ink sm:text-right"
+          >
+            <span className="t-label block text-ink-3">Next</span>
+            <span className="mt-1.5 inline-flex items-center gap-1.5">
+              {next.title}
+              <span
+                aria-hidden="true"
+                className="transition-transform duration-[220ms] ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5"
+              >
+                →
+              </span>
+            </span>
+          </Link>
+        )}
+      </nav>
+    </article>
   );
 }

@@ -1,287 +1,310 @@
 "use client";
 
-import { useState } from "react";
-import type { Project } from "@/lib/projects";
+import { useMemo, useState } from "react";
+import Glass from "./Glass";
 
+const statuses = ["Shipped", "In progress", "Archived"] as const;
+
+type Status = (typeof statuses)[number];
+
+const initial = {
+  title: "",
+  slug: "",
+  year: new Date().getFullYear(),
+  kicker: "",
+  summary: "",
+  description: "",
+  highlights: "",
+  stack: "",
+  plate: "",
+  repoUrl: "",
+  status: "Archived" as Status,
+  featured: false,
+  hue: 52,
+};
+
+const fields =
+  "w-full rounded-[var(--radius-sm)] border border-[var(--line)] bg-canvas-deep px-3 py-2.5 text-[0.9375rem] text-ink transition-colors duration-200 placeholder:text-ink-3 hover:border-[var(--line-strong)] focus:border-accent";
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+/**
+ * Dev helper: fills in a `projects.ts` entry in the shape the site now expects,
+ * so adding a project does not mean re-reading the type definition.
+ * Noindexed and kept out of the nav — it is a tool, not a page.
+ */
 export default function AddProjectForm() {
-  const [formData, setFormData] = useState({
-    title: "",
-    slug: "",
-    tagline: "",
-    tags: "",
-    year: new Date().getFullYear(),
-    coverImage: "",
-    description: "",
-    liveUrl: "",
-    repoUrl: "",
-    featured: false,
-    status: "wip" as "live" | "wip" | "archived",
-  });
+  const [form, setForm] = useState(initial);
+  const [copied, setCopied] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  const update = <K extends keyof typeof initial>(
+    key: K,
+    value: (typeof initial)[K],
   ) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
-    }));
+    setForm((prev) => ({ ...prev, [key]: value }));
+    setCopied(false);
+  };
 
-    // Auto-generate slug from title
-    if (name === "title") {
-      const slug = value
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-      setFormData((prev) => ({ ...prev, slug }));
+  const listOf = (value: string) =>
+    value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+  const snippet = useMemo(() => {
+    const highlights = form.highlights
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    return `  {
+    slug: "${form.slug}",
+    title: "${form.title}",
+    year: ${form.year},
+    kicker: "${form.kicker}",
+    summary:
+      "${form.summary}",
+    description:
+      "${form.description}",
+    highlights: [
+${highlights.map((line) => `      "${line}",`).join("\n")}
+    ],
+    stack: [${listOf(form.stack).map((item) => `"${item}"`).join(", ")}],
+    plate: [${listOf(form.plate).map((item) => `"${item}"`).join(", ")}],
+    ${form.repoUrl ? `repoUrl: "${form.repoUrl}",\n    ` : ""}status: "${form.status}",
+    ${form.featured ? "featured: true,\n    " : ""}hue: ${form.hue},
+  },`;
+  }, [form]);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(snippet);
+      setCopied(true);
+    } catch {
+      setCopied(false);
     }
   };
 
-  const previewProject: Project = {
-    title: formData.title || "Project Title",
-    slug: formData.slug || "project-slug",
-    tagline: formData.tagline || "Project tagline goes here",
-    tags: formData.tags ? formData.tags.split(",").map((t) => t.trim()) : [],
-    year: formData.year,
-    coverImage: formData.coverImage || "/placeholder.jpg",
-    description: formData.description || "Project description will appear here.",
-    liveUrl: formData.liveUrl || undefined,
-    repoUrl: formData.repoUrl || "https://github.com/username/repo",
-    featured: formData.featured,
-    status: formData.status,
-  };
-
-  const generateCode = () => {
-    const code = `  {
-    title: "${formData.title}",
-    slug: "${formData.slug}",
-    tagline: "${formData.tagline}",
-    tags: [${formData.tags.split(",").map((t) => `"${t.trim()}"`).join(", ")}],
-    year: ${formData.year},
-    coverImage: "${formData.coverImage}",
-    description: "${formData.description}",
-    ${formData.liveUrl ? `liveUrl: "${formData.liveUrl}",` : ""}
-    repoUrl: "${formData.repoUrl}",
-    ${formData.featured ? "featured: true," : ""}
-    status: "${formData.status}",
-  },`;
-    return code;
-  };
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(generateCode());
-    alert("Code copied to clipboard! Paste it into src/lib/projects.ts");
-  };
-
   return (
-    <div className="max-w-6xl mx-auto p-4 grid gap-8 lg:grid-cols-2">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Add New Project</h1>
-        <p className="text-muted-foreground mb-8">
-          Fill in the details below to generate project code for your portfolio.
+    <div className="shell grid gap-8 pb-16 pt-32 md:pt-40 lg:grid-cols-12">
+      <div className="lg:col-span-6">
+        <p className="t-label text-ink-3">Tool</p>
+        <h1 className="t-3xl mt-3">New project entry</h1>
+        <p className="t-sm measure mt-3 text-ink-2">
+          Fill this in, copy the result, and paste it into the{" "}
+          <code className="font-mono text-ink">projects</code> array in{" "}
+          <code className="font-mono text-ink">src/lib/projects.ts</code>. The
+          plate lines are the repository&rsquo;s own top-level folders. That is
+          what the card shows, so there is no cover image to supply.
         </p>
 
-        <form className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">GitHub Repository URL *</label>
+        <form
+          className="mt-8 space-y-5"
+          onSubmit={(event) => event.preventDefault()}
+        >
+          <Field label="Title" htmlFor="title">
             <input
-              type="url"
-              name="repoUrl"
-              value={formData.repoUrl}
-              onChange={handleChange}
-              placeholder="https://github.com/username/repo"
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              id="title"
+              className={fields}
+              value={form.title}
+              placeholder="Preemie Tracker"
+              onChange={(event) => {
+                update("title", event.target.value);
+                update("slug", slugify(event.target.value));
+              }}
               required
             />
+          </Field>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Slug" htmlFor="slug">
+              <input
+                id="slug"
+                className={`${fields} text-ink-2`}
+                value={form.slug}
+                readOnly
+              />
+            </Field>
+            <Field label="Year" htmlFor="year">
+              <input
+                id="year"
+                type="number"
+                className={fields}
+                value={form.year}
+                onChange={(event) => update("year", Number(event.target.value))}
+              />
+            </Field>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Project Title *</label>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Kicker" htmlFor="kicker">
+              <input
+                id="kicker"
+                className={fields}
+                value={form.kicker}
+                placeholder="Personal product"
+                onChange={(event) => update("kicker", event.target.value)}
+              />
+            </Field>
+            <Field label="Tint hue (0 to 360)" htmlFor="hue">
+              <input
+                id="hue"
+                type="number"
+                min={0}
+                max={360}
+                className={fields}
+                value={form.hue}
+                onChange={(event) => update("hue", Number(event.target.value))}
+              />
+            </Field>
+          </div>
+
+          <Field label="Summary (one sentence for the card)" htmlFor="summary">
             <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="My Awesome Project"
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              required
+              id="summary"
+              className={fields}
+              value={form.summary}
+              placeholder="Offline-first care tracking for a premature baby."
+              onChange={(event) => update("summary", event.target.value)}
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Slug (auto-generated)</label>
-            <input
-              type="text"
-              name="slug"
-              value={formData.slug}
-              onChange={handleChange}
-              placeholder="my-awesome-project"
-              className="w-full px-3 py-2 border border-border rounded-md bg-muted-foreground/20"
-              readOnly
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Tagline *</label>
-            <input
-              type="text"
-              name="tagline"
-              value={formData.tagline}
-              onChange={handleChange}
-              placeholder="A short, catchy description"
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Tags (comma-separated) *</label>
-            <input
-              type="text"
-              name="tags"
-              value={formData.tags}
-              onChange={handleChange}
-              placeholder="React, TypeScript, Node.js"
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Year *</label>
-            <input
-              type="number"
-              name="year"
-              value={formData.year}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Cover Image Path *</label>
-            <input
-              type="text"
-              name="coverImage"
-              value={formData.coverImage}
-              onChange={handleChange}
-              placeholder="/project-image.jpg"
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              required
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Place image in public/ folder and reference it here
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Description *</label>
+          <Field label="Description (the case-study paragraph)" htmlFor="description">
             <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Describe your project in detail..."
+              id="description"
               rows={4}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              required
+              className={fields}
+              value={form.description}
+              onChange={(event) => update("description", event.target.value)}
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Live URL (optional)</label>
-            <input
-              type="url"
-              name="liveUrl"
-              value={formData.liveUrl}
-              onChange={handleChange}
-              placeholder="https://myproject.com"
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Status *</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
-              required
-            >
-              <option value="live">Live</option>
-              <option value="wip">Work in Progress</option>
-              <option value="archived">Archived</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="featured"
-              checked={formData.featured}
-              onChange={handleChange}
-              id="featured"
-              className="w-4 h-4"
-            />
-            <label htmlFor="featured" className="text-sm font-medium">
-              Featured project
-            </label>
-          </div>
-
-          <button
-            type="button"
-            onClick={copyToClipboard}
-            className="w-full px-4 py-2 bg-foreground text-background rounded-md hover:bg-accent hover:text-background transition-colors"
+          <Field
+            label="Highlights (one per line)"
+            htmlFor="highlights"
+            hint="Facts only. If it cannot be checked, it does not belong here."
           >
-            Copy Code to Clipboard
-          </button>
+            <textarea
+              id="highlights"
+              rows={4}
+              className={fields}
+              value={form.highlights}
+              onChange={(event) => update("highlights", event.target.value)}
+            />
+          </Field>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Stack (comma separated)" htmlFor="stack">
+              <input
+                id="stack"
+                className={fields}
+                value={form.stack}
+                placeholder="React Native, Supabase"
+                onChange={(event) => update("stack", event.target.value)}
+              />
+            </Field>
+            <Field label="Plate (top-level paths)" htmlFor="plate">
+              <input
+                id="plate"
+                className={fields}
+                value={form.plate}
+                placeholder="src/, app/"
+                onChange={(event) => update("plate", event.target.value)}
+              />
+            </Field>
+          </div>
+
+          <Field label="Repository URL (optional)" htmlFor="repoUrl">
+            <input
+              id="repoUrl"
+              type="url"
+              className={fields}
+              value={form.repoUrl}
+              placeholder="https://github.com/myusufbudiawan/…"
+              onChange={(event) => update("repoUrl", event.target.value)}
+            />
+          </Field>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Status" htmlFor="status">
+              <select
+                id="status"
+                className={fields}
+                value={form.status}
+                onChange={(event) => update("status", event.target.value as Status)}
+              >
+                {statuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
+            <div className="flex items-end pb-2">
+              <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-[0.9375rem]">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-[var(--accent)]"
+                  checked={form.featured}
+                  onChange={(event) => update("featured", event.target.checked)}
+                />
+                Featured on the home page
+              </label>
+            </div>
+          </div>
         </form>
       </div>
 
-      <div className="lg:sticky lg:top-24 h-fit">
-        <h2 className="text-xl font-semibold mb-4">Live Preview</h2>
-        <div className="border border-border rounded-lg overflow-hidden">
-          <div
-            className="aspect-video flex items-center justify-center"
-            style={{
-              background: 'linear-gradient(135deg, rgba(100, 116, 139, 0.15) 0%, rgba(100, 116, 139, 0.05) 100%)'
-            }}
-          >
-            <h3 className="text-3xl font-bold text-slate-600 dark:text-slate-400 text-center px-4 line-clamp-2">
-              {previewProject.title}
-            </h3>
+      <div className="lg:col-span-6">
+        <div className="lg:sticky lg:top-28">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="t-label text-ink-3">Generated entry</h2>
+            <button type="button" onClick={copy} className="btn btn-primary h-9 min-h-9 px-4 text-xs">
+              {copied ? "Copied" : "Copy"}
+            </button>
           </div>
-          <div className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs px-2 py-1 rounded-full bg-secondary text-secondary-foreground">
-                {previewProject.status}
-              </span>
-              <span className="text-xs text-muted-foreground">{previewProject.year}</span>
-            </div>
-            <p className="text-sm text-muted-foreground mb-3">{previewProject.tagline}</p>
-            <div className="flex flex-wrap gap-1 mb-3">
-              {previewProject.tags.slice(0, 3).map((tag) => (
-                <span key={tag} className="text-xs text-muted-foreground">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <p className="text-sm text-muted-foreground line-clamp-3">
-              {previewProject.description}
-            </p>
-          </div>
-        </div>
 
-        <div className="mt-6">
-          <h3 className="text-sm font-semibold mb-2 text-muted-foreground uppercase tracking-wider">
-            Generated Code
-          </h3>
-          <pre className="bg-muted p-4 rounded-md text-xs overflow-x-auto">
-            <code>{generateCode()}</code>
-          </pre>
+          <Glass className="overflow-hidden">
+            <pre className="max-h-[70vh] overflow-auto p-5 font-mono text-[0.75rem] leading-[1.7] text-ink-2">
+              <code>{snippet}</code>
+            </pre>
+          </Glass>
+
+          <p aria-live="polite" className="t-xs mt-3 text-ink-3">
+            {copied
+              ? "Copied. Paste it as the first element of the projects array."
+              : "Copy is offline-safe. It writes to the clipboard only."}
+          </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function Field({
+  label,
+  htmlFor,
+  hint,
+  children,
+}: {
+  label: string;
+  htmlFor: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label htmlFor={htmlFor} className="t-sm mb-1.5 block font-medium">
+        {label}
+      </label>
+      {children}
+      {hint && <p className="t-xs mt-1.5 text-ink-3">{hint}</p>}
     </div>
   );
 }

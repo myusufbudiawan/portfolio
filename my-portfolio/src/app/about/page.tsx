@@ -1,78 +1,90 @@
-import Header from "@/components/Header";
+import type { Metadata } from "next";
+import ExperienceList, { ExperiencePanel } from "@/components/ExperienceList";
+import { EducationPanel } from "@/components/SkillsPanel";
+import ContactBand from "@/components/ContactBand";
+import Portrait from "@/components/Portrait";
+import { profile } from "@/lib/profile";
+import { siteUrl } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "About",
+  description:
+    "Software Engineer 2 at Dell Technologies. From middleware SRE to .NET platform development: API design, marketplace integrations, and local-LLM tooling.",
+  alternates: { canonical: `${siteUrl}/about/` },
+};
+
+const paragraphs = [
+  "I started at Dell Technologies as an undergraduate intern, automating the email-based data collection a factory floor was doing by hand and putting the result on a Grafana and Power BI dashboard. I came back after graduating as a middleware SRE, keeping IBM MQ, Kafka, Axway SecureTransport and OpenText BizManager alive through production incidents, and writing the Python and PowerShell that removed the manual steps around them.",
+  "In October 2024 I moved onto the platform itself: REST APIs and OAuth-secured routes for a .NET 8 marketplace orchestration platform running on an on-premise Kubernetes cluster, then retailer onboarding for NewEgg, eBay, Best Buy and Plugg.To: configurable workflow engines, data mapping, and the internal configuration UI the operations teams actually use.",
+  "The work I keep gravitating toward is making a system legible. The most recent example is a natural-language-to-configuration assistant on a company-hosted local model: it turns a plain-language request into a retailer workflow config, and explains an existing config back to someone who has never opened one. That is the same instinct as the SRE postmortems, pointed at a different audience.",
+];
 
 export default function AboutPage() {
   return (
-    <main className="font-sans max-w-4xl mx-auto p-4">
-      <Header />
-      <section className="py-12">
-        <h1 className="text-3xl font-bold mb-8">About</h1>
-        
-        <div className="prose max-w-none mb-12">
-          <p className="text-lg leading-relaxed">
-            I am a Software Engineer with experience in managing middleware application and development of DotNet API for Dell Technologies.
-          </p>
-          <p className="text-lg leading-relaxed">
-            I build clean, efficient solutions with a focus on user experience and maintainable code. Currently exploring modern web technologies and best practices.
-          </p>
-        </div>
+    <>
+      <section className="shell pt-32 pb-10 md:pt-40">
+        <p className="t-label rise text-ink-3">About</p>
+        <h1 className="t-display rise rise-1 mt-4 max-w-[16ch]">
+          Who I am, in the order it happened.
+        </h1>
+      </section>
 
-        <div className="mb-12">
-          <h2 className="text-sm font-semibold mb-4 text-muted-foreground uppercase tracking-wider">
-            Skills
-          </h2>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div>
-              <h3 className="font-medium mb-2">Languages</h3>
-              <p className="text-muted-foreground text-sm">TypeScript, JavaScript, C#, Python</p>
-            </div>
-            <div>
-              <h3 className="font-medium mb-2">Frameworks</h3>
-              <p className="text-muted-foreground text-sm">Next.js, React, .NET, Node.js</p>
-            </div>
-            <div>
-              <h3 className="font-medium mb-2">Databases</h3>
-              <p className="text-muted-foreground text-sm">PostgreSQL, MongoDB, SQL Server</p>
-            </div>
-            <div>
-              <h3 className="font-medium mb-2">Tools</h3>
-              <p className="text-muted-foreground text-sm">Git, Docker, AWS, Azure</p>
+      <section className="shell pb-14 md:pb-20">
+        <div className="grid gap-10 md:grid-cols-12 md:gap-12">
+          {/* Photo first on phones, right-hand column from md up. */}
+          <div className="min-w-0 md:order-2 md:col-span-5">
+            <div className="rise rise-1">
+              <Portrait
+                aspect="4 / 5"
+                priority
+                className="portrait--print portrait--mobile-circle max-w-md"
+                focus="50% 22%"
+              />
             </div>
           </div>
-        </div>
 
-        <div className="border-t border-border pt-12">
-          <h2 className="text-sm font-semibold mb-4 text-muted-foreground uppercase tracking-wider">
-            Get in Touch
-          </h2>
-          <p className="mb-6 text-muted-foreground">
-            Feel free to reach out for collaborations or just a friendly hello.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <a
-              href="mailto:myusufbudiawan@gmail.com"
-              className="inline-flex items-center px-4 py-2 bg-foreground text-background rounded-md hover:bg-accent hover:text-background transition-colors"
-            >
-              Email
-            </a>
-            <a
-              href="https://github.com/myusufbudiawan"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 border border-border rounded-md hover:bg-secondary transition-colors"
-            >
-              GitHub
-            </a>
-            <a
-              href="https://my.linkedin.com/in/yusuf-budiawan"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 border border-border rounded-md hover:bg-secondary transition-colors"
-            >
-              LinkedIn
-            </a>
+          <div className="min-w-0 md:order-1 md:col-span-7">
+            <div className="space-y-5">
+              {paragraphs.map((text, index) => (
+                <p
+                  key={index}
+                  className={
+                    index === 0
+                      ? "t-lg text-ink"
+                      : "t-base measure text-ink-2"
+                  }
+                >
+                  {text}
+                </p>
+              ))}
+            </div>
+
+            <div className="rule my-8" />
+
+            <p className="t-base measure text-ink-2">
+              I am based in {profile.location} and currently pursuing
+              development-focused roles. The part of the work I want more of is
+              designing the API and the data model, rather than only operating
+              them.
+            </p>
+
+            <div className="mt-8">
+              <EducationPanel />
+            </div>
           </div>
         </div>
       </section>
-    </main>
+
+      <section className="shell pb-14 md:pb-20">
+        <h2 className="t-label mb-6 text-ink-3">Experience</h2>
+        <ExperiencePanel title="Dell Technologies · Cyberjaya">
+          <ExperienceList />
+        </ExperiencePanel>
+      </section>
+
+      <div className="shell pb-4">
+        <ContactBand />
+      </div>
+    </>
   );
 }

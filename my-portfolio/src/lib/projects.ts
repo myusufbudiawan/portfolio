@@ -1,40 +1,215 @@
+/**
+ * Real projects only.
+ *
+ * Every entry maps to a repository that exists at github.com/myusufbudiawan,
+ * or to the Preemie Tracker described in the resume (private repository — no
+ * link). Copy is limited to what the repository contents actually show:
+ * language, module layout, and stated purpose. `plate` is that layout, used as
+ * the card's cover — the structure is the visual.
+ */
+
 export type Project = {
-  title: string;
   slug: string;
-  tagline: string;
-  tags: string[];
+  title: string;
   year: number;
-  coverImage: string;
+  kicker: string;
+  summary: string;
   description: string;
-  liveUrl?: string;
-  repoUrl: string;
+  highlights: string[];
+  stack: string[];
+  plate: string[];
+  repoUrl?: string;
+  /** Deployed build that can be embedded in an iframe. */
+  demoUrl?: string;
+  /** What the address bar shows. */
+  demoLabel?: string;
+  /** Phone width for mobile apps exported to web. */
+  demoKind?: "phone" | "window";
+  status: "Shipped" | "In progress" | "Archived";
   featured?: boolean;
-  status: "live" | "wip" | "archived";
+  /** Hue for the card tint. Low chroma on purpose, applied in globals.css. */
+  hue: number;
 };
 
 export const projects: Project[] = [
   {
-    title: "AI-Powered Personal Finance Manager",
-    slug: "ai-finance-manager",
-    tagline: "Smart budgeting with AI insights",
-    tags: ["Next.js", "Node.js", "PostgreSQL", "TensorFlow", "AI"],
-    year: 2024,
-    coverImage: "/placeholder-project-1.jpg",
-    description: "An application for analyzing personal spending habits and providing budget recommendations using AI. Features include automated categorization, spending pattern analysis, and personalized financial advice based on historical data.",
-    repoUrl: "https://github.com/myusufbudiawan/ai-finance-manager",
+    slug: "preemie-tracker",
+    title: "PreemieTrack",
+    year: 2026,
+    kicker: "Personal product",
+    summary:
+      "A calm, local-first tracker for premature-infant care: six care-event types, notes, and a configurable corrected-age engine.",
+    description:
+      "Built around the one constraint that matters in a NICU: the log has to work before anything else does. Every care event is written to a local SQLite store first, across all six event types plus free-text notes, behind a SecureStore-backed session boundary. A configurable corrected-age engine sits underneath it, and a Fastify API exposes the care-events and audit domains. The window above is the deployed build, not a recording.",
+    highlights: [
+      "Local-first SQLite logging across six care-event types plus notes",
+      "Configurable corrected-age engine, explicitly flagged for clinical review",
+      "SecureStore-backed session boundary; no clinical thresholds or dosing logic shipped",
+      "Fastify API with a care-events / audit domain pair",
+      "Phase 0 and Phase 1 done; growth dashboards, reminders, sync and auth are Phase 2",
+    ],
+    stack: ["Expo", "React Native", "TypeScript", "SQLite", "Fastify"],
+    plate: ["apps/mobile/", "services/", "docs/", "PREEMIETRACK_PLAN.md"],
+    repoUrl: "https://github.com/myusufbudiawan/NadineApp",
+    demoUrl: "https://nadineapp-mobile.vercel.app/home",
+    demoLabel: "nadineapp-mobile.vercel.app/home",
+    demoKind: "phone",
+    status: "In progress",
     featured: true,
-    status: "live",
+    hue: 52,
   },
   {
-    title: "Blockchain-Based Secure Document Vault",
-    slug: "blockchain-document-vault",
-    tagline: "Decentralized document verification",
-    tags: ["Node.js", "Ethereum", "MongoDB", "Blockchain", "Web3"],
-    year: 2023,
-    coverImage: "/placeholder-project-2.jpg",
-    description: "A document storage platform utilizing blockchain for verification and security. Documents are hashed and stored on-chain for immutable proof of existence, with encrypted off-chain storage for the actual content.",
-    repoUrl: "https://github.com/myusufbudiawan/blockchain-vault",
-    featured: false,
-    status: "archived",
+    slug: "mycovid",
+    title: "MyCovid",
+    year: 2021,
+    kicker: "Final-year project",
+    summary:
+      "A health-tracking Android client with its own Spring backend and a separate client SDK.",
+    description:
+      "The final-year project for my degree, shipped as three repositories: the Android application, a Spring Boot backend, and a client SDK that wraps the API for the app. The application layer is a Gradle Android module with its own screenshot set, and the whole system is documented in a written project report.",
+    highlights: [
+      "Android client, Spring Boot backend and a wrapper SDK as separate repositories",
+      "REST API consumed through a first-party SDK rather than calls scattered across screens",
+      "Documented in a full final-year project report",
+    ],
+    stack: ["Java", "Android", "Spring Boot", "Gradle"],
+    plate: [
+      "app/ (Android)",
+      "mycovid-backend/",
+      "mycovid-backend-sdk/",
+      "FYP2 Report.pdf",
+    ],
+    repoUrl: "https://github.com/myusufbudiawan/MyCovid",
+    status: "Archived",
+    featured: true,
+    hue: 202,
+  },
+  {
+    slug: "shopping-microservice",
+    title: "Shopping Microservice",
+    year: 2024,
+    kicker: "Service architecture",
+    summary:
+      "Five Maven modules: an API gateway, Eureka discovery, and independent cart, order and product services.",
+    description:
+      "A working split of a shopping backend into independently deployable Spring Boot services, fronted by a Spring Cloud Gateway and registered through Eureka so no module hard-codes another's address. Cart, order and product each own their domain and their own build.",
+    highlights: [
+      "Spring Cloud Gateway in front of three domain services",
+      "Eureka server for discovery, so services resolve each other by name",
+      "One Maven module per service, with independent builds and deploys",
+    ],
+    stack: ["Java", "Spring Boot", "Spring Cloud Gateway", "Eureka", "Maven"],
+    plate: [
+      "api_gateway/",
+      "eureka-server/",
+      "cart-service/",
+      "order_service/",
+      "product-service/",
+    ],
+    repoUrl:
+      "https://github.com/myusufbudiawan/Shopping-Microservice-with-Java",
+    status: "Archived",
+    featured: true,
+    hue: 148,
+  },
+  {
+    slug: "appointment-scheduling",
+    title: "Appointment Scheduling",
+    year: 2022,
+    kicker: "Coursework",
+    summary:
+      "ASP.NET Core MVC appointment system with EF Core migrations and a server-rendered admin surface.",
+    description:
+      "A conventional MVC application: controllers, Razor views, and an Entity Framework Core model layer with checked-in migrations for the schema history. The kind of CRUD shape you have to build once, properly, before you can see where a real system starts to bend.",
+    highlights: [
+      "Controllers, Razor views and models organised by concern",
+      "EF Core migrations committed alongside the code",
+      "Client-side libraries managed through libman rather than a bundler",
+    ],
+    stack: ["C#", "ASP.NET Core MVC", "Entity Framework Core", "Razor"],
+    plate: ["Controllers/", "Models/", "Views/", "Migrations/"],
+    repoUrl: "https://github.com/myusufbudiawan/AppointmentScheduling",
+    status: "Archived",
+    hue: 250,
+  },
+  {
+    slug: "dall-e-mini",
+    title: "DALL·E Mini",
+    year: 2022,
+    kicker: "Experiment",
+    summary:
+      "A deliberately small Python experiment: one entry script driving a thin image-generation client.",
+    description:
+      "Two files, one idea: how little code does a text-to-image workflow actually need? `main.py` is the entry point and `dalle.py` holds the client. Kept short on purpose, as a way to read the API surface instead of hiding it behind a framework.",
+    highlights: [
+      "Entry script and client kept separate, with no framework in between",
+      "Written to read the underlying API rather than wrap it",
+    ],
+    stack: ["Python"],
+    plate: ["main.py", "dalle.py"],
+    repoUrl: "https://github.com/myusufbudiawan/DALL-E-Mini",
+    status: "Archived",
+    hue: 30,
+  },
+  {
+    slug: "photo-gallery",
+    title: "Photo Gallery",
+    year: 2020,
+    kicker: "Coursework",
+    summary:
+      "Cross-platform mobile gallery built with Ionic and Angular, packaged for native with Capacitor.",
+    description:
+      "A web codebase shipped as a mobile app: Angular for the application, Ionic for the components and platform conventions, Capacitor for the native container. Includes an e2e suite and the Karma unit-test setup that ships with the starter.",
+    highlights: [
+      "One Angular codebase targeting web and native through Capacitor",
+      "E2E and unit-test scaffolding wired in from the start",
+    ],
+    stack: ["TypeScript", "Angular", "Ionic", "Capacitor"],
+    plate: ["src/", "e2e/", "ionic.config.json", "capacitor.config.json"],
+    repoUrl: "https://github.com/myusufbudiawan/photoGallery",
+    status: "Archived",
+    hue: 195,
+  },
+  {
+    slug: "yupotify",
+    title: "Yupotify",
+    year: 2020,
+    kicker: "Coursework",
+    summary:
+      "An iOS music player in Swift, with unit and UI test targets from the Xcode project.",
+    description:
+      "A native iOS player built as an Xcode project with both a unit-test and a UI-test target. The earliest thing here, and the reason I still reach for a test target before a feature list.",
+    highlights: [
+      "Swift, native Xcode project",
+      "Unit and UI test targets kept alongside the app",
+    ],
+    stack: ["Swift", "Xcode", "iOS"],
+    plate: [
+      "Yupotify/",
+      "YupotifyTests/",
+      "YupotifyUITests/",
+      "Yupotify.xcodeproj",
+    ],
+    repoUrl: "https://github.com/myusufbudiawan/Yupotify",
+    status: "Archived",
+    hue: 240,
   },
 ];
+
+export const featuredProjects = projects.filter((project) => project.featured);
+
+export function getProject(slug: string): Project | undefined {
+  return projects.find((project) => project.slug === slug);
+}
+
+export function getNeighbours(slug: string): {
+  previous?: Project;
+  next?: Project;
+} {
+  const index = projects.findIndex((project) => project.slug === slug);
+  if (index === -1) return {};
+  return {
+    previous: index > 0 ? projects[index - 1] : undefined,
+    next: index < projects.length - 1 ? projects[index + 1] : undefined,
+  };
+}
