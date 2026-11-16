@@ -37,7 +37,8 @@ export default function AboutPage() {
                 aspect="4 / 5"
                 priority
                 sizes="(min-width: 768px) 40vw, 100vw"
-                className="portrait--print max-w-md"
+                print
+                className="max-w-md"
                 focus="50% 22%"
               />
             </div>
