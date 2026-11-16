@@ -4,7 +4,7 @@ Personal site for **Muhammad Yusuf Budiawan** — Software Engineer 2 at Dell Te
 Kuala Lumpur. Backend and full-stack: REST APIs, marketplace orchestration platforms on
 Kubernetes, and the LLM tooling that configures them.
 
-Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4.
+Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Framer Motion.
 
 ## Run it
 
@@ -18,19 +18,22 @@ npm run build && npm start
 
 | Route | What it is |
 |---|---|
-| `/` | Hero, three featured projects, experience, toolbox, contact |
-| `/work` | All seven repositories |
-| `/work/[slug]` | Case study per project (`generateStaticParams`, fully static) |
-| `/about` | Bio, education, full experience |
+| `/` | Portrait + spec panel, three featured projects, experience, toolbox, contact |
+| `/work` | All seven repositories; the lead card shows a blurred, non-interactive preview |
+| `/work/[slug]` | Case study. Deployed projects lead with the running app in a live window |
+| `/about` | Portrait, bio, education, full experience |
 | `/add-project` | Dev helper that drafts a `projects.ts` entry. `noindex`, not in nav |
+
+`/work/[slug]` is fully static (`generateStaticParams`), including the pages that embed a
+live app — the iframe is mounted by the browser, not by the server.
 
 ## Structure
 
 ```
 src/
 ├── app/
-│   ├── layout.tsx          # shell: aurora canvas, nav, footer, skip link, metadata
-│   ├── globals.css         # design tokens + the glass material
+│   ├── layout.tsx          # shell: aurora canvas, nav, footer, skip link, metadata, theme script
+│   ├── globals.css         # design tokens, the glass material, live-window chrome, portrait frame
 │   ├── page.tsx            # home
 │   ├── work/               # index + [slug] case studies
 │   ├── about/  add-project/  not-found.tsx
@@ -40,12 +43,16 @@ src/
 ├── components/
 │   ├── Glass.tsx           # the material primitive
 │   ├── SpecularCard.tsx    # pointer-tracked specular (writes --mx/--my, no re-render)
+│   ├── LiveWindow.tsx      # sandboxed iframe of a deployed app, deferred until near viewport
+│   ├── Portrait.tsx        # fixed frame, photo or designed placeholder
+│   ├── ThemeToggle.tsx     # light / dark / system popover
 │   ├── Nav.tsx             # floating capsule, shared-layout active pill
 │   ├── Hero.tsx  ProjectCard.tsx  ExperienceList.tsx  SkillsPanel.tsx
 │   └── SectionHeading.tsx  ContactBand.tsx  Footer.tsx  AddProjectForm.tsx
 └── lib/
     ├── profile.ts          # résumé as data — the single source of truth
     ├── projects.ts         # real repositories only
+    ├── theme.ts            # theme store + the pre-paint script
     └── og.tsx              # shared social-card renderer
 ```
 
@@ -55,23 +62,53 @@ Apple's Liquid Glass, ported to CSS: a translucent body (`backdrop-filter` blur 
 saturation), a refracting rim (a masked `backdrop-filter` ring, so the edge actually
 re-filters the backdrop), and an optional specular that tracks the pointer.
 
-Two rules the code enforces:
+Three rules the code enforces:
 
 - **System type first.** SF Pro on macOS, Segoe UI on Windows, a self-hosted Inter
   latin variable subset only on Linux/Android. No third-party font request, and a
   Google Fonts outage cannot break the build.
-- **No cover images.** The repositories contain no screenshots, so a project card
-  shows the repo's real top-level layout in mono over a low-chroma tint. Nothing on
-  this site is a stock photo or an invented metric.
+- **No stock imagery.** Project covers are the repository's real top-level layout in mono
+  over a low-chroma tint, because none of the repos contain screenshots. The only
+  photograph on the site is the owner's own portrait, once supplied.
+- **Real states, not defaults.** Every empty, loading and missing state is designed: the
+  portrait placeholder, the live-window loading bar, the 404.
 
 Each material degrades independently: `prefers-reduced-transparency` turns glass into
 a solid surface and drops the aurora, `prefers-contrast: more` adds a 1.5px ink border,
 `prefers-reduced-motion` removes movement and keeps opacity.
 
-Theme is light / dark / system, chosen from the control at the top right (inside the nav
-capsule on phones). "System" removes `data-theme` so the OS decides; an explicit choice
-sets it and persists in `localStorage`, applied by an inline script in `<head>` before first
-paint so there is no flash of the wrong palette.
+## Live app embeds
+
+A project with a `demoUrl` gets two things: a blurred, non-interactive preview as its card
+cover, and an interactive window on its case study page — glass chrome, real address bar,
+reload and open-in-new-tab.
+
+- The iframe mounts only within 400px of the viewport, so a below-the-fold embed costs
+  nothing until it is reached.
+- It is sandboxed **without** `allow-top-navigation`, so the embedded app can never move
+  this site out from under the reader.
+- On touch devices one tap hands control over (`pointer: coarse`, not `hover: none`), since
+  an interactive iframe otherwise swallows page scroll.
+- The window's geometry is applied inline, so a stale or partial stylesheet cannot collapse
+  it into an unstyled stack.
+- Note: an embedded app follows the **OS** colour scheme. `color-scheme` on an iframe does
+  not propagate `prefers-color-scheme` into the child, so a forced theme will not reach it.
+
+To enable one, add to the project in `src/lib/projects.ts`:
+
+```ts
+demoUrl: "https://example.vercel.app",
+demoLabel: "example.vercel.app",
+demoKind: "phone",   // "phone" for mobile apps exported to web, otherwise "window"
+```
+
+## Theme
+
+Light / dark / system, from the control at the top right (inside the nav capsule on
+phones). "System" removes `data-theme` so the OS decides; an explicit choice sets it and
+persists in `localStorage`, applied by an inline script in `<head>` before first paint so
+there is no flash of the wrong palette. `color-scheme` follows the choice, so scrollbars
+and form controls change too.
 
 ## Adding your portrait
 
@@ -92,16 +129,31 @@ props already in place; both slots load with `priority` because they sit above t
 
 Open `/add-project`, fill the form, copy the generated entry, and paste it as the first
 element of `projects` in `src/lib/projects.ts`. The `plate` field is the repository's
-top-level paths — that is what the card displays, so there is no image to supply.
+top-level paths — that is what the card displays, so there is no image to supply. The form
+does not cover `demoUrl` / `demoLabel` / `demoKind`; add those by hand (see Live app embeds).
 
 ## Verified
 
-Production build, Chromium: **0 axe-core violations** (WCAG 2.0/2.1 A+AA, light and dark,
-1440×900 and 390×844), **CLS 0**, **LCP 848 ms** on a throttled mobile connection
-(1.5 Mbps / 150 ms RTT, 4× CPU), 209 kB total transfer, no console errors, clean tab order
-with a visible focus ring on every stop.
+Production build (`next build` + `next start`), Chromium via Playwright, measured on the
+build at `cb6ec00`:
+
+| | Home | Case study |
+|---|---|---|
+| LCP, desktop | 240 ms | 220 ms |
+| LCP, throttled mobile (1.5 Mbps / 150 ms RTT, 4× CPU) | 848 ms | 640 ms |
+| CLS | 0 | 0 |
+| Own transfer | 233 kB | 229 kB |
+| Requests | 18 | 16 |
+
+Also: **0 axe-core violations** (WCAG 2.0/2.1 A+AA, light and dark, 1440×900 and 390×844),
+static audit **0 FAIL / 0 WARN** across 10 pages, no console errors, no horizontal overflow
+from 320 to 1600 px, clean tab order with a visible focus ring on every stop.
+
+Case-study numbers exclude the embedded app's own resources, which are third-party and only
+loaded when that window comes into view.
 
 ## Deploy
 
-Vercel, zero config. Set the canonical domain in `src/app/layout.tsx` and
-`src/app/sitemap.ts` (`siteUrl` / `base`) once it is not `myusufbudiawan.vercel.app`.
+Vercel, zero config. The canonical domain is hardcoded in three places — update all three
+once it is not `myusufbudiawan.vercel.app`: `siteUrl` in `src/app/layout.tsx`, `base` in
+`src/app/sitemap.ts`, and the `sitemap` URL in `src/app/robots.ts`.
