@@ -16,7 +16,7 @@ export const profile = {
   github: "https://github.com/myusufbudiawan",
   linkedin: "https://www.linkedin.com/in/yusuf-budiawan",
   headline:
-    "Marketplace platforms, APIs, and the LLM tooling that configures them.",
+    "Building Intelligent Backends, Powerful APIs & AI-Driven Tools.",
   intro:
     "Software Engineer 2 at Dell Technologies in Cyberjaya. I build REST APIs and configuration tooling for a marketplace orchestration platform that runs eight-plus retailer integrations on an on-premise Kubernetes cluster, and I use LLMs to make that configuration work legible to people who never touch the config.",
   availability: "Open to backend and full-stack roles",
@@ -26,14 +26,14 @@ export const profile = {
    * To publish a photo: save it as `public/portrait.jpg` (portrait crop, face
    * in the upper third, at least 1200px wide) and set this to "/portrait.jpg".
    */
-  portrait: null as string | null,
+  portrait: "/portrait.jpg",
   portraitAlt: "Muhammad Yusuf Budiawan",
 } as const;
 
 export const specSheet: { label: string; value: string }[] = [
   { label: "Currently", value: "Software Engineer 2, Dell Technologies" },
-  { label: "Focus", value: ".NET APIs, workflow config, local LLMs" },
-  { label: "Core stack", value: ".NET 8, Python, TypeScript, Kubernetes" },
+  { label: "Focus", value: "REST APIs, workflow config, React frontend" },
+  { label: "Core stack", value: ".NET, Python, TypeScript, Kubernetes" },
   { label: "Based in", value: "Kuala Lumpur, Malaysia" },
 ];
 
@@ -64,7 +64,7 @@ export const experience: Experience[] = [
       "Applied the Specification design pattern for flexible, extensible PATCH operations on quoted baskets; hardened authentication by removing an insecure fallback and adding OAuth to dashboard APIs.",
       "Drove end-to-end test automation with AutoGenius across 10+ release cycles, and used Devin for feature enablement, bug fixes, unit-test authoring and prototyping.",
     ],
-    stack: [".NET 8", "REST", "OAuth", "Kubernetes", "Local LLM", "AutoGenius"],
+    stack: [".NET 10", "REST API", "Python", "Kubernetes", "React", "AI-Driven Development"],
   },
   {
     role: "Software Engineer 1 (Middleware SRE)",
@@ -109,7 +109,7 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     label: "Infrastructure",
-    items: ["Kubernetes", "Linux", "GitLab CI/CD", "REST APIs", "Supabase"],
+    items: ["Kubernetes", "Linux", "GitLab CI/CD", "REST APIs", "MongoDB", "MSSQLServer", "Supabase"],
   },
   {
     label: "Practice",

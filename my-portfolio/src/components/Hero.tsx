@@ -48,7 +48,7 @@ export default function Hero() {
                 priority
                 sizes="(min-width: 1024px) 26rem, 100vw"
                 className="rounded-none"
-                focus="50% 24%"
+                focus="50% 5%"
               />
               <dl className="hairline-list relative z-10">
                 {specSheet.map((row) => (
@@ -67,10 +67,12 @@ export default function Hero() {
           <p className="t-xs mt-3 px-1 text-ink-3">
             Résumé v2-3, updated April 2026.{" "}
             <a
-              href={`mailto:${profile.email}?subject=Résumé request`}
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-ink-2 underline decoration-[var(--line-strong)] decoration-1 underline-offset-2 transition-colors duration-200 hover:text-ink"
             >
-              Ask for the PDF
+              View resume
             </a>
             .
           </p>

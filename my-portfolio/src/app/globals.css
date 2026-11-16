@@ -1006,6 +1006,21 @@
 /* Decoration only: the frame's size, clip and radius are inline in
    components/Portrait.tsx so a stale stylesheet cannot let the image escape. */
 
+/* Below md the About portrait shrinks to a small circular badge instead of
+   spanning the column. `!important` is needed to beat the inline
+   aspect-ratio the Portrait component sets. */
+@media (max-width: 47.99rem) {
+  .portrait--mobile-circle {
+    width: 9rem;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 9999px;
+  }
+
+  .portrait--mobile-circle .portrait__empty::after {
+    border-radius: inherit;
+  }
+}
+
 .portrait__empty {
   background-image: radial-gradient(
       85% 75% at 28% 0%,

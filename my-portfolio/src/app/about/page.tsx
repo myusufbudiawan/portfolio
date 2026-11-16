@@ -36,9 +36,8 @@ export default function AboutPage() {
               <Portrait
                 aspect="4 / 5"
                 priority
-                sizes="(min-width: 768px) 40vw, 100vw"
-                print
-                className="max-w-md"
+                sizes="(min-width: 768px) 40vw, 10rem"
+                className="portrait--print portrait--mobile-circle max-w-md"
                 focus="50% 22%"
               />
             </div>

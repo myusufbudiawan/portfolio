@@ -26,7 +26,7 @@ export default function Home() {
         <div className="grid gap-5 md:grid-cols-12">
           {lead && (
             <div className="min-w-0 md:col-span-12 lg:col-span-7">
-              <ProjectCard project={lead} size="lg" />
+              <ProjectCard project={lead} size="lg" mutedPreview />
             </div>
           )}
           {second && (
