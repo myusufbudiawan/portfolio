@@ -1006,6 +1006,11 @@
 /* Decoration only: the frame's size, clip and radius are inline in
    components/Portrait.tsx so a stale stylesheet cannot let the image escape. */
 
+/* Standalone framing (About): the photo carries its own elevation. */
+.portrait--print {
+  box-shadow: var(--shadow-2), inset 0 0 0 1px var(--glass-line);
+}
+
 /* Below md the About portrait shrinks to a small circular badge instead of
    spanning the column. `!important` is needed to beat the inline
    aspect-ratio the Portrait component sets. */
@@ -1013,7 +1018,7 @@
   .portrait--mobile-circle {
     width: 9rem;
     aspect-ratio: 1 / 1 !important;
-    border-radius: 9999px;
+    border-radius: 9999px !important;
   }
 
   .portrait--mobile-circle .portrait__empty::after {

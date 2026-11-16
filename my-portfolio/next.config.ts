@@ -14,7 +14,9 @@ import type { NextConfig } from "next";
  * mode, because static hosting has no image service to resize anything.
  */
 const isExport = process.env.PAGES_EXPORT === "1";
-const basePath = isExport ? (process.env.PAGES_BASE_PATH ?? "") : "";
+const basePath = isExport
+  ? (process.env.PAGES_BASE_PATH ?? process.env.NEXT_PUBLIC_BASE_PATH ?? "")
+  : "";
 
 const nextConfig: NextConfig = {
   ...(isExport

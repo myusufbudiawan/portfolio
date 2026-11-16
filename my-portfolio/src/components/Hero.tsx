@@ -3,6 +3,7 @@ import Glass from "./Glass";
 import SpecularCard from "./SpecularCard";
 import Portrait from "./Portrait";
 import { profile, specSheet } from "@/lib/profile";
+import { basePath } from "@/lib/site";
 
 /**
  * The hero is one focal point: a statement, a promise, two doors out. The glass
@@ -46,7 +47,6 @@ export default function Hero() {
               <Portrait
                 aspect="16 / 10"
                 priority
-                sizes="(min-width: 1024px) 26rem, 100vw"
                 className="rounded-none"
                 focus="50% 5%"
               />
@@ -67,7 +67,7 @@ export default function Hero() {
           <p className="t-xs mt-3 px-1 text-ink-3">
             Résumé v2-3, updated April 2026.{" "}
             <a
-              href="/resume.pdf"
+              href={`${basePath}/resume.pdf`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-ink-2 underline decoration-[var(--line-strong)] decoration-1 underline-offset-2 transition-colors duration-200 hover:text-ink"
