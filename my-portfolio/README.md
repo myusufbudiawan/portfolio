@@ -10,9 +10,18 @@ Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Framer M
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
-npm run build && npm start
+npm run dev            # http://localhost:3000
+
+npm run build          # server build
+npm start              # serve it
+
+npm run build:pages    # static export to out/ (what GitHub Pages deploys)
 ```
+
+`build:pages` is the only build that differs: it sets `output: "export"`, marks images
+unoptimised (static hosting has no image service) and turns on `trailingSlash` so Pages can
+serve `work/slug/` from `work/slug/index.html`. It reads `PAGES_BASE_PATH` and
+`NEXT_PUBLIC_SITE_URL` from the environment — see Deploy.
 
 ## Pages
 
@@ -154,6 +163,24 @@ loaded when that window comes into view.
 
 ## Deploy
 
-Vercel, zero config. The canonical domain is hardcoded in three places — update all three
-once it is not `myusufbudiawan.vercel.app`: `siteUrl` in `src/app/layout.tsx`, `base` in
-`src/app/sitemap.ts`, and the `sitemap` URL in `src/app/robots.ts`.
+GitHub Pages, via `.github/workflows/nextjs.yml`. On every push to `main` (or a manual
+run) it installs, exports, and publishes `my-portfolio/out`.
+
+One-time setup: **Settings → Pages → Source: GitHub Actions.** Nothing else — the
+workflow's `actions/configure-pages` step supplies the base path, so a project site gets
+`/portfolio` and a user site or custom domain gets an empty prefix without touching code.
+
+The site is served from `https://myusufbudiawan.github.io/portfolio/`. If that moves:
+
+1. Set `NEXT_PUBLIC_SITE_URL` in the workflow (it feeds canonical URLs, Open Graph, the
+   sitemap and robots — all from `src/lib/site.ts`, one source of truth).
+2. For a custom domain, add it in Settings → Pages; `configure-pages` then reports an empty
+   base path and asset URLs follow automatically.
+
+Two details the workflow handles that a naive export gets wrong:
+
+- `robots.txt`, `sitemap.xml` and the social images are route handlers, which an export
+  cannot render at request time. They carry `export const dynamic = "force-static"`.
+- Next writes the generated social cards as extension-less files, which Pages serves as
+  `application/octet-stream`. `scripts/fix-pages-assets.mjs` renames them to `.png` and
+  rewrites the references in the emitted HTML.

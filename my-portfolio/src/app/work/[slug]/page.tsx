@@ -5,6 +5,7 @@ import Glass from "@/components/Glass";
 import SpecularCard from "@/components/SpecularCard";
 import LiveWindow from "@/components/LiveWindow";
 import { getNeighbours, getProject, projects } from "@/lib/projects";
+import { siteUrl } from "@/lib/site";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -21,14 +22,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title: project.title,
     description,
-    alternates: { canonical: `/work/${project.slug}` },
+    alternates: { canonical: `${siteUrl}/work/${project.slug}/` },
     openGraph: {
       title: `${project.title}, ${project.year}`,
       description,
       type: "article",
       images: [
         {
-          url: "/opengraph-image",
+          url: `${siteUrl}/opengraph-image`,
           width: 1200,
           height: 630,
           alt: `${project.title}, ${project.year}`,

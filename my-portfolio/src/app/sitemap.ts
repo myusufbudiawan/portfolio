@@ -1,7 +1,10 @@
 import type { MetadataRoute } from "next";
 import { projects } from "@/lib/projects";
+import { siteUrl as base } from "@/lib/site";
 
-const base = "https://myusufbudiawan.vercel.app";
+// Required for the GitHub Pages static export: route handlers are dynamic by
+// default, and an export cannot render one at request time.
+export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

@@ -4,12 +4,13 @@ import { EducationPanel } from "@/components/SkillsPanel";
 import ContactBand from "@/components/ContactBand";
 import Portrait from "@/components/Portrait";
 import { profile } from "@/lib/profile";
+import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "About",
   description:
     "Software Engineer 2 at Dell Technologies. From middleware SRE to .NET platform development: API design, marketplace integrations, and local-LLM tooling.",
-  alternates: { canonical: "/about" },
+  alternates: { canonical: `${siteUrl}/about/` },
 };
 
 const paragraphs = [

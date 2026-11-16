@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import ProjectCard from "@/components/ProjectCard";
 import ContactBand from "@/components/ContactBand";
 import { projects } from "@/lib/projects";
+import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Work",
   description:
     "Repositories by Muhammad Yusuf Budiawan: an offline-first React Native product, a three-repository final-year system, and Spring Boot microservices.",
-  alternates: { canonical: "/work" },
+  alternates: { canonical: `${siteUrl}/work/` },
 };
 
 export default function WorkPage() {

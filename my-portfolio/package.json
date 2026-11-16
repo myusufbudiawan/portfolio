@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:pages": "PAGES_EXPORT=1 next build && node scripts/fix-pages-assets.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.18.1",

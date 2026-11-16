@@ -6,6 +6,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { themeScript } from "@/lib/theme";
 import Footer from "@/components/Footer";
 import { profile } from "@/lib/profile";
+import { siteOrigin, siteUrl } from "@/lib/site";
 
 /**
  * System faces win on macOS (SF Pro) and Windows (Segoe UI); Inter is only the
@@ -21,10 +22,8 @@ const inter = localFont({
   fallback: ["system-ui", "sans-serif"],
 });
 
-const siteUrl = "https://myusufbudiawan.vercel.app";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(siteOrigin),
   title: {
     default: `${profile.name} · ${profile.discipline} engineer`,
     template: `%s · ${profile.name}`,
@@ -33,10 +32,10 @@ export const metadata: Metadata = {
     "Software Engineer 2 at Dell Technologies, Kuala Lumpur. REST APIs, marketplace orchestration platforms on Kubernetes, and the LLM tooling that configures them.",
   authors: [{ name: profile.name, url: profile.github }],
   creator: profile.name,
-  alternates: { canonical: "/" },
+  alternates: { canonical: `${siteUrl}/` },
   openGraph: {
     type: "website",
-    url: siteUrl,
+    url: `${siteUrl}/`,
     siteName: profile.name,
     title: `${profile.name} · ${profile.discipline} engineer`,
     description:
