@@ -996,6 +996,68 @@
   }
 }
 
+/* ===========================================================================
+   Portrait
+   A fixed frame the photo drops into, so nothing reflows when it lands. Until
+   then the frame holds a labelled placeholder: a tinted plane, the monogram,
+   and a dashed hairline that reads as reserved rather than broken.
+   =========================================================================== */
+
+.portrait {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--canvas-deep);
+  box-shadow: inset 0 0 0 1px var(--glass-line);
+}
+
+.portrait img {
+  object-fit: cover;
+}
+
+/* Standalone use (About): the photo carries its own elevation. */
+.portrait--print {
+  box-shadow: var(--shadow-2), inset 0 0 0 1px var(--glass-line);
+}
+
+.portrait__empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: inherit;
+  background-image: radial-gradient(
+      85% 75% at 28% 0%,
+      color-mix(in oklab, var(--aurora-1) 60%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      75% 75% at 102% 100%,
+      color-mix(in oklab, var(--aurora-2) 50%, transparent),
+      transparent 72%
+    );
+}
+
+.portrait__empty::after {
+  content: "";
+  position: absolute;
+  inset: 0.5rem;
+  border-radius: calc(var(--radius-lg) - 0.375rem);
+  border: 1px dashed color-mix(in oklab, var(--ink) 24%, transparent);
+  pointer-events: none;
+}
+
+.portrait__monogram {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: color-mix(in oklab, var(--ink) 28%, transparent);
+}
+
 /* Project plate: the "cover" for a project is its real module layout, tinted.
    No stock imagery, nothing invented — the tint is the only decoration. */
 .project-plate {

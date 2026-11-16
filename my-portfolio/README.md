@@ -73,6 +73,21 @@ capsule on phones). "System" removes `data-theme` so the OS decides; an explicit
 sets it and persists in `localStorage`, applied by an inline script in `<head>` before first
 paint so there is no flash of the wrong palette.
 
+## Adding your portrait
+
+The portrait slot is built and empty. The frame is fixed (16:10 on the home panel, 4:5 on
+About), so nothing reflows when the photo lands — CLS stays at 0.
+
+1. Save the photo as `public/portrait.jpg`. Portrait crop, face in the upper third, at least
+   1200px on the long edge.
+2. In `src/lib/profile.ts`, change `portrait: null` to `portrait: "/portrait.jpg"`.
+3. Adjust `focus` on the two call sites if the crop clips your head; it is an
+   `object-position` value, default `"50% 20%"`.
+
+Until then the slot renders a labelled placeholder (monogram plus a dashed hairline), not a
+broken image and not a stock face. `next/image` handles sizing and format from the `sizes`
+props already in place; both slots load with `priority` because they sit above the fold.
+
 ## Adding a project
 
 Open `/add-project`, fill the form, copy the generated entry, and paste it as the first

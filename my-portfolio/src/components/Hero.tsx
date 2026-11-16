@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Glass from "./Glass";
 import SpecularCard from "./SpecularCard";
+import Portrait from "./Portrait";
 import { profile, specSheet } from "@/lib/profile";
 
 /**
@@ -42,6 +43,13 @@ export default function Hero() {
             aria-label="At a glance"
           >
             <SpecularCard className="relative z-10">
+              <Portrait
+                aspect="16 / 10"
+                priority
+                sizes="(min-width: 1024px) 26rem, 100vw"
+                className="rounded-none"
+                focus="50% 24%"
+              />
               <dl className="hairline-list relative z-10">
                 {specSheet.map((row) => (
                   <div

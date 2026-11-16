@@ -20,6 +20,14 @@ export const profile = {
   intro:
     "Software Engineer 2 at Dell Technologies in Cyberjaya. I build REST APIs and configuration tooling for a marketplace orchestration platform that runs eight-plus retailer integrations on an on-premise Kubernetes cluster, and I use LLMs to make that configuration work legible to people who never touch the config.",
   availability: "Open to backend and full-stack roles",
+
+  /**
+   * Portrait. Null renders a designed placeholder instead of a broken image.
+   * To publish a photo: save it as `public/portrait.jpg` (portrait crop, face
+   * in the upper third, at least 1200px wide) and set this to "/portrait.jpg".
+   */
+  portrait: null as string | null,
+  portraitAlt: "Muhammad Yusuf Budiawan",
 } as const;
 
 export const specSheet: { label: string; value: string }[] = [

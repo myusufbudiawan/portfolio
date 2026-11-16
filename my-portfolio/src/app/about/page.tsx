@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import ExperienceList, { ExperiencePanel } from "@/components/ExperienceList";
 import { EducationPanel } from "@/components/SkillsPanel";
 import ContactBand from "@/components/ContactBand";
+import Portrait from "@/components/Portrait";
 import { profile } from "@/lib/profile";
 
 export const metadata: Metadata = {
@@ -29,7 +30,20 @@ export default function AboutPage() {
 
       <section className="shell pb-14 md:pb-20">
         <div className="grid gap-10 md:grid-cols-12 md:gap-12">
-          <div className="md:col-span-7">
+          {/* Photo first on phones, right-hand column from md up. */}
+          <div className="min-w-0 md:order-2 md:col-span-5">
+            <div className="rise rise-1">
+              <Portrait
+                aspect="4 / 5"
+                priority
+                sizes="(min-width: 768px) 40vw, 100vw"
+                className="portrait--print max-w-md"
+                focus="50% 22%"
+              />
+            </div>
+          </div>
+
+          <div className="min-w-0 md:order-1 md:col-span-7">
             <div className="space-y-5">
               {paragraphs.map((text, index) => (
                 <p
@@ -53,10 +67,10 @@ export default function AboutPage() {
               designing the API and the data model, rather than only operating
               them.
             </p>
-          </div>
 
-          <div className="md:col-span-5">
-            <EducationPanel />
+            <div className="mt-8">
+              <EducationPanel />
+            </div>
           </div>
         </div>
       </section>
